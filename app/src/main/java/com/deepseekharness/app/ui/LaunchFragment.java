@@ -215,7 +215,7 @@ public class LaunchFragment extends Fragment {
 
     private void finishWebEntry(View root, String message) {
         enteringWeb = false;
-        ((TextView) root.findViewById(R.id.launch_status)).setText(com.deepseekharness.app.util.UiStateText.render(message));
+        ((TextView) root.findViewById(R.id.launch_status)).setText(com.deepseekharness.app.util.UiText.text(com.deepseekharness.app.util.UiStateText.render(message)));
         refreshRunState();
     }
 

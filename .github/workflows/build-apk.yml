@@ -1,0 +1,80 @@
+name: Build APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Test and build debug APKs
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK components
+        run: |
+          yes | sdkmanager --licenses >/dev/null 2>&1 || true
+          sdkmanager \
+            "platforms;android-37" \
+            "build-tools;36.0.0" \
+            "ndk;26.3.11579264"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Run unit tests
+        env:
+          DSHA_PYTHON: python3
+        run: ./gradlew :app:testStandardDebugUnitTest --no-daemon
+
+      - name: Build debug APKs
+        env:
+          DSHA_PYTHON: python3
+        run: ./gradlew :app:assembleStandardDebug :app:assembleLowDebug --no-daemon
+
+      - name: Create checksums
+        run: |
+          sha256sum app/build/outputs/apk/standard/debug/app-standard-debug.apk \
+            > app/build/outputs/apk/standard/debug/app-standard-debug.apk.sha256
+          sha256sum app/build/outputs/apk/low/debug/app-low-debug.apk \
+            > app/build/outputs/apk/low/debug/app-low-debug.apk.sha256
+
+      - name: Upload standard APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: dsha-standard-debug
+          path: |
+            app/build/outputs/apk/standard/debug/app-standard-debug.apk
+            app/build/outputs/apk/standard/debug/app-standard-debug.apk.sha256
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload compatibility APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: dsha-low-debug
+          path: |
+            app/build/outputs/apk/low/debug/app-low-debug.apk
+            app/build/outputs/apk/low/debug/app-low-debug.apk.sha256
+          if-no-files-found: error
+          retention-days: 30

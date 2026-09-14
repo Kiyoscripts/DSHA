@@ -46,7 +46,7 @@ public final class DiagnosticActivity extends AppCompatActivity {
             catch (RuntimeException error) { Toast.makeText(this, com.deepseekharness.app.util.UiText.text("无法打开文件管理器，请尝试下载到默认目录"), Toast.LENGTH_LONG).show(); }
         });
         logs.state.observe(this, state -> {
-            ((TextView) findViewById(R.id.diagnostic_logs_status)).setText(com.deepseekharness.app.util.UiStateText.render(state.message));
+            ((TextView) findViewById(R.id.diagnostic_logs_status)).setText(com.deepseekharness.app.util.UiText.text(com.deepseekharness.app.util.UiStateText.render(state.message)));
             findViewById(R.id.diagnostic_logs_download).setEnabled(!state.busy);
             findViewById(R.id.diagnostic_logs_save_as).setEnabled(!state.busy);
             findViewById(R.id.diagnostic_logs_status).setEnabled(!state.busy && state.uri != null);

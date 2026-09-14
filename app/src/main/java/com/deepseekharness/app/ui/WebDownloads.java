@@ -30,7 +30,7 @@ public final class WebDownloads {
                         .setMessage(com.deepseekharness.app.util.UiText.text("")).setNegativeButton(com.deepseekharness.app.util.UiText.text("取消"), (d,w) -> model.cancel()).setCancelable(false).create();
                 String count = String.format(java.util.Locale.ROOT, "\n%.1f MiB", state.bytes()/1048576.0);
                 if (state.total() > 0) count += String.format(java.util.Locale.ROOT, " / %.1f MiB",state.total()/1048576.0);
-                dialog.setMessage(com.deepseekharness.app.util.UiStateText.render(state.message()) + count); dialog.show();
+                dialog.setMessage(com.deepseekharness.app.util.UiText.text(com.deepseekharness.app.util.UiStateText.render(state.message()) + count)); dialog.show();
             } else {
                 dismiss();
                 if (state.phase().equals("ready") && !model.pickerOpen) {
@@ -42,7 +42,7 @@ public final class WebDownloads {
                         Toast.makeText(activity,com.deepseekharness.app.util.UiText.text("无法打开保存位置选择器，请启用系统文件应用后重试"),Toast.LENGTH_LONG).show(); }
                 } else if (state.phase().equals("done") || state.phase().equals("error")) {
                     if (state.phase().equals("error") && model.canRetrySave()) {
-                        dialog = new com.deepseekharness.app.ui.DshaDialogBuilder(activity).setTitle(com.deepseekharness.app.util.UiText.text("文件尚未保存")).setMessage(com.deepseekharness.app.util.UiStateText.render(state.message()))
+                        dialog = new com.deepseekharness.app.ui.DshaDialogBuilder(activity).setTitle(com.deepseekharness.app.util.UiText.text("文件尚未保存")).setMessage(com.deepseekharness.app.util.UiText.text(com.deepseekharness.app.util.UiStateText.render(state.message())))
                                 .setPositiveButton(com.deepseekharness.app.util.UiText.text("更换位置重试"),(d,w) -> model.retrySave())
                                 .setNegativeButton(com.deepseekharness.app.util.UiText.text("取消"),(d,w) -> model.acknowledge()).setCancelable(false).create(); dialog.show();
                     } else Toast.makeText(activity,state.message(),Toast.LENGTH_LONG).show();

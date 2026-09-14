@@ -59,7 +59,7 @@ public final class StartupRecoveryActivity extends AppCompatActivity {
     private static JSONObject request(String command){JSONObject value=new JSONObject();try{value.put("command",command);}catch(JSONException ignored){}return value;}
     private void confirm(String title,String detail,Runnable work){new com.deepseekharness.app.ui.DshaDialogBuilder(this).setTitle(title)
             .setMessage(detail+t("\n\n操作会停止 Web 和终端，并保留修复前配置。","\n\nThis stops Web and terminal sessions and saves the configuration before making changes."))
-            .setNegativeButton(t("取消","Cancel"),null).setPositiveButton(t("继续","Continue"),(d,w)->work.run()).show();}
+            .setNegativeButton(t(com.deepseekharness.app.util.UiText.text("取消"),"Cancel"),null).setPositiveButton(t(com.deepseekharness.app.util.UiText.text("继续"),"Continue"),(d,w)->work.run()).show();}
     private void repair(JSONObject request){
         if(!BackupTask.get(this).repairStartup(request))Toast.makeText(this,t("已有任务进行中，请完成后重试。","Another task is in progress. Retry when it finishes."),Toast.LENGTH_LONG).show();
         refresh.run();
@@ -71,7 +71,7 @@ public final class StartupRecoveryActivity extends AppCompatActivity {
             JSONObject request=request("new");try{request.put("target",targets[index]);}catch(JSONException ignored){}
             confirm(names[index],t("将以默认内容替换所选配置。原文件保存到修复前快照，插件文件、会话和原生 API Key 保留。",
                     "Replace the selected configuration with defaults. Save the original files in a pre-repair snapshot and retain plugin files, sessions, and the native API key."),()->repair(request));
-        }).setNegativeButton(t("取消","Cancel"),null).show();
+        }).setNegativeButton(t(com.deepseekharness.app.util.UiText.text("取消"),"Cancel"),null).show();
     }
     private void retry(boolean safe){
         if(StartupRepairs.pending(this)){status(readable("RECOVERY_PENDING"));return;}
@@ -81,12 +81,12 @@ public final class StartupRecoveryActivity extends AppCompatActivity {
     private void renderAttempts(){
         if(attempts==null)return;attempts.removeAllViews();
         for(StartupHistoryStore.Entry entry:model.attempts){
-            String status="ready".equals(entry.status)?t("就绪","Ready"):"failed".equals(entry.status)?t("失败","Failed"):
+            String status="ready".equals(entry.status)?t("就绪","Ready"):"failed".equals(entry.status)?t(com.deepseekharness.app.util.UiText.text("失败"),"Failed"):
                     "stopped".equals(entry.status)?t("已停止","Stopped"):t("启动中／已中断","Starting / interrupted");
             button(attempts,date(entry.started)+" · "+status+" · "+entry.elapsed/1000+"s",()->{
                 ScrollView scroll=new ScrollView(this);TextView text=new TextView(this);text.setPadding(dp(16),dp(12),dp(16),dp(12));text.setTextIsSelectable(true);
-                text.setText(entry.stage+"\n\n"+StartupText.render(entry.reason)+"\n\n"+entry.log);scroll.addView(text);
-                new com.deepseekharness.app.ui.DshaDialogBuilder(this).setTitle(date(entry.started)).setView(scroll).setPositiveButton(t("关闭","Close"),null).show();
+                text.setText(com.deepseekharness.app.util.UiText.text(entry.stage+"\n\n"+StartupText.render(entry.reason)+"\n\n"+entry.log));scroll.addView(text);
+                new com.deepseekharness.app.ui.DshaDialogBuilder(this).setTitle(com.deepseekharness.app.util.UiText.text(date(entry.started))).setView(scroll).setPositiveButton(t(com.deepseekharness.app.util.UiText.text("关闭"),"Close"),null).show();
             },false);
         }
         if(model.attempts.isEmpty()){TextView empty=label(attempts,controller.startupDiagnostics().historyError().isEmpty()

@@ -33,7 +33,7 @@ public final class PluginInstallActivity extends AppCompatActivity {
         }
         repository = new ViewModelProvider(this).get(PluginRepository.class);
         repository.state().observe(this, state -> {
-            status.setText(com.deepseekharness.app.util.UiStateText.render(state.message)); install.setEnabled(!state.busy);
+            status.setText(com.deepseekharness.app.util.UiText.text(com.deepseekharness.app.util.UiStateText.render(state.message))); install.setEnabled(!state.busy);
             renderPreview();
         });
         repository.preview().observe(this, ignored -> renderPreview());
@@ -56,7 +56,7 @@ public final class PluginInstallActivity extends AppCompatActivity {
         }
         PluginRepository.Preview preview = repository.preview().getValue();
         if (preview != null) {
-            details.setText(preview.description()); install.setText(com.deepseekharness.app.util.UiText.text("确认安装"));
+            details.setText(com.deepseekharness.app.util.UiText.text(preview.description())); install.setText(com.deepseekharness.app.util.UiText.text("确认安装"));
         } else {
             details.setText(com.deepseekharness.app.util.UiText.text("下载并解析插件包后，会显示真实作者、版本和兼容范围。确认安装前不会启用插件。\n\n") + com.deepseekharness.app.util.SensitiveData.redact(request.url));
             install.setText(HarnessController.get(this).isEnvironmentReady() ? com.deepseekharness.app.util.UiText.text("解析链接 / 重试") : com.deepseekharness.app.util.UiText.text("初始化 DSHA"));

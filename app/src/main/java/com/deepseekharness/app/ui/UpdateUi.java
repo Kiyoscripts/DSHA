@@ -20,7 +20,7 @@ final class UpdateUi {
                 && (state.stage == UpdateRepository.Stage.IDLE || state.stage == UpdateRepository.Stage.DOWNLOADING);
         boolean indeterminate = verifyingInstall || state.stage != UpdateRepository.Stage.DOWNLOADING || state.total <= 0;
         RadioGroup channels = root.findViewById(R.id.update_channels);
-        ((TextView) root.findViewById(R.id.update_status)).setText(com.deepseekharness.app.util.UiStateText.render(state.message));
+        ((TextView) root.findViewById(R.id.update_status)).setText(com.deepseekharness.app.util.UiText.text(com.deepseekharness.app.util.UiStateText.render(state.message)));
         ((TextView) root.findViewById(R.id.update_notes)).setText(state.release == null ? ""
                 : state.release.version + " · " + String.format(java.util.Locale.ROOT, "%.2f MiB", state.release.bytes / 1048576.0) + "\n\n" + state.release.notes);
         ProgressBar progress = root.findViewById(R.id.update_progress);

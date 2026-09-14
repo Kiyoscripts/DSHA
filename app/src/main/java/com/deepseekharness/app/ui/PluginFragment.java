@@ -196,7 +196,7 @@ public class PluginFragment extends Fragment {
         status.setOnClickListener(v -> {
             if (current != null && !current.message.isEmpty())
                 new com.deepseekharness.app.ui.DshaDialogBuilder(requireContext()).setTitle(com.deepseekharness.app.util.UiText.text("插件操作结果"))
-                        .setMessage(com.deepseekharness.app.util.UiStateText.render(current.message)).setPositiveButton(com.deepseekharness.app.util.UiText.text("关闭"), null).show();
+                        .setMessage(com.deepseekharness.app.util.UiText.text(com.deepseekharness.app.util.UiStateText.render(current.message))).setPositiveButton(com.deepseekharness.app.util.UiText.text("关闭"), null).show();
         });
         repository.state().observe(getViewLifecycleOwner(), state -> { current = state; render(); });
         repository.preview().observe(getViewLifecycleOwner(), ignored -> showInstallPreview());
@@ -246,7 +246,7 @@ public class PluginFragment extends Fragment {
         PluginRepository.Preview preview = repository.preview().getValue();
         if (preview == null) return;
         previewDialog = new com.deepseekharness.app.ui.DshaDialogBuilder(requireContext()).setTitle(com.deepseekharness.app.util.UiText.text("确认安装插件"))
-                .setMessage(preview.description())
+                .setMessage(com.deepseekharness.app.util.UiText.text(preview.description()))
                 .setNegativeButton(com.deepseekharness.app.util.UiText.text("取消"), (d, w) -> repository.discardPreview())
                 .setPositiveButton(com.deepseekharness.app.util.UiText.text("确认安装"), (d, w) -> repository.confirmPreview())
                 .setOnCancelListener(d -> repository.discardPreview()).create();
@@ -353,12 +353,12 @@ public class PluginFragment extends Fragment {
         if (current.percent >= 0) progress.setProgress(current.percent);
         root.findViewById(R.id.btnCancelPluginTask).setVisibility(current.busy ? View.VISIBLE : View.GONE);
         root.findViewById(R.id.btnCancelPluginTask).setEnabled(current.cancellable);
-        ((TextView) root.findViewById(R.id.statusText)).setText(com.deepseekharness.app.util.UiStateText.render(current.message));
+        ((TextView) root.findViewById(R.id.statusText)).setText(com.deepseekharness.app.util.UiText.text(com.deepseekharness.app.util.UiStateText.render(current.message)));
         for (int id : new int[]{R.id.btnImport, R.id.btnImportFallback, R.id.btnExport, R.id.btnRefresh, R.id.btnPluginUpdates, R.id.btnPluginRestore})
             root.findViewById(id).setEnabled(!current.busy);
         TextView sort=root.findViewById(R.id.btnSort);
-        sort.setText(sortLabels()[sortOrder.ordinal()]);
-        sort.setContentDescription(getString(R.string.plugin_sort_title)+" · "+sort.getText());
+        sort.setText(com.deepseekharness.app.util.UiText.text(sortLabels()[sortOrder.ordinal()]));
+        sort.setContentDescription(com.deepseekharness.app.util.UiText.text(getString(R.string.plugin_sort_title)+" · "+sort.getText()));
         visibleItems.clear();
         String query = search.getText().toString().trim().toLowerCase(Locale.ROOT);
         for (PluginRepository.Item item : current.items) {

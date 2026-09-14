@@ -59,7 +59,7 @@ public final class UpdateActivity extends AppCompatActivity {
             ((TextView) findViewById(R.id.update_status)).setText(install.verifying
                     ? com.deepseekharness.app.util.UiText.text("正在重新校验安装包…") : com.deepseekharness.app.util.UiText.text("校验完成，返回此页面后继续安装"));
         } else if (install.error != null) {
-            ((TextView) findViewById(R.id.update_status)).setText(com.deepseekharness.app.util.UiStateText.render(state.message) + "\n" + com.deepseekharness.app.util.UiStateText.render(install.error));
+            ((TextView) findViewById(R.id.update_status)).setText(com.deepseekharness.app.util.UiText.text(com.deepseekharness.app.util.UiStateText.render(state.message) + "\n" + com.deepseekharness.app.util.UiStateText.render(install.error)));
         }
     }
 

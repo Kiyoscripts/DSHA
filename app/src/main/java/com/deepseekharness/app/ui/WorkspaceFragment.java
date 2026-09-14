@@ -193,7 +193,7 @@ public class WorkspaceFragment extends Fragment {
         clear.setText(pending ? com.deepseekharness.app.util.UiText.text("恢复中断维护") : com.deepseekharness.app.util.UiText.text("备份并重建环境"));
         if (s.status == com.deepseekharness.app.util.BackupTaskState.Status.PREVIEW && previewDialog == null && isResumed()) {
             previewDialog = new com.deepseekharness.app.ui.DshaDialogBuilder(requireContext()).setTitle(com.deepseekharness.app.util.UiText.text("恢复预览"))
-                    .setMessage(com.deepseekharness.app.util.UiStateText.render(s.detail))
+                    .setMessage(com.deepseekharness.app.util.UiText.text(com.deepseekharness.app.util.UiStateText.render(s.detail)))
                     .setPositiveButton(com.deepseekharness.app.util.UiText.text("恢复此备份"), (d, w) -> task.decide(s.id, true))
                     .setNegativeButton(com.deepseekharness.app.util.UiText.text("取消"), (d, w) -> task.decide(s.id, false))
                     .setOnCancelListener(d -> task.decide(s.id, false)).create();
