@@ -42,6 +42,17 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Restore verified full offline assets
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 \
+            --output /tmp/dsha-official.apk \
+            https://github.com/DSH-APP/DSHA/releases/download/v0.1.5-rc2/dsha-0.1.5-rc2.apk
+          printf '%s  %s\n' \
+            85cb7c7213681ced654788f940b16313b3b5e2b662add87432ede95446a30658 \
+            /tmp/dsha-official.apk | sha256sum --check --strict
+          python3 tools/prepare-full-build-assets.py /tmp/dsha-official.apk
+
       - name: Run unit tests
         env:
           DSHA_PYTHON: python3
@@ -51,6 +62,30 @@ jobs:
         env:
           DSHA_PYTHON: python3
         run: ./gradlew :app:assembleStandardDebug :app:assembleLowDebug --no-daemon
+
+      - name: Audit standard APK assets
+        run: python3 tools/audit-standard-apk.py app/build/outputs/apk/standard/debug/app-standard-debug.apk
+
+      - name: Confirm full offline assets
+        run: |
+          python3 - <<'PY'
+          from zipfile import ZipFile
+          for path in (
+              'app/build/outputs/apk/standard/debug/app-standard-debug.apk',
+              'app/build/outputs/apk/low/debug/app-low-debug.apk',
+          ):
+              with ZipFile(path) as apk:
+                  names = set(apk.namelist())
+                  required = {
+                      'assets/offline-rootfs.bin',
+                      'assets/dsh-runtime.bin',
+                      'assets/ubuntu-tools.bin',
+                  }
+                  missing = required - names
+                  if missing:
+                      raise SystemExit(f'{path}: missing full assets: {sorted(missing)}')
+                  print(path, 'contains full offline assets')
+          PY
 
       - name: Create checksums
         run: |
