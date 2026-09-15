@@ -106,7 +106,7 @@ public class InstallPipelineTest {
         Environment environment = new Environment(); environment.missingResult = true;
         InstallTask task = environment.run(false, 3);
         assertEquals(InstallTask.Outcome.FAILED, task.snapshot().outcome);
-        assertTrue(task.snapshot().log.contains("未收到结果"));
+        assertTrue(task.snapshot().log.contains("no result received"));
     }
     @Test public void earlyContainerExitLeavesAllSixResultsAndDoesNotStartRepairs() throws Exception {
         Environment environment = new Environment(); environment.earlyExit = true;
@@ -115,7 +115,7 @@ public class InstallPipelineTest {
         assertEquals(InstallTask.Step.OK, task.snapshot().steps[0]);
         for (int i = 1; i < 6; i++) {
             assertEquals(InstallTask.Step.FAILED, task.snapshot().steps[i]);
-            assertTrue(task.snapshot().details[i].contains("未收到结果"));
+            assertTrue(task.snapshot().details[i].contains("no result received"));
         }
         assertEquals(0, environment.repairs());
     }

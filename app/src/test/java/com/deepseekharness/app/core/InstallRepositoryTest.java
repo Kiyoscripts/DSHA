@@ -140,8 +140,8 @@ public class InstallRepositoryTest {
             Thread worker = new Thread(queue::runNext); worker.start();
             try {
                 long end = System.nanoTime() + 2_000_000_000L;
-                while (!repository.snapshot().phase.contains("继续回收") && System.nanoTime() < end) Thread.sleep(10);
-                assertTrue(repository.snapshot().phase.contains("继续回收"));
+                while (!repository.snapshot().phase.contains("Cleanup continues") && System.nanoTime() < end) Thread.sleep(10);
+                assertTrue(repository.snapshot().phase.contains("Cleanup continues"));
                 assertTrue(repository.snapshot().busy()); assertTrue(EnvironmentTaskGate.isBusy());
                 assertNull(EnvironmentTaskGate.tryAcquire("维护")); assertFalse(repository.start(true, 0));
             } finally { alive.set(false); worker.join(2000); }

@@ -17,6 +17,6 @@ public class DshAuthLogTest {
         DshAuthLog log = new DshAuthLog();
         assertEquals("", log.append("token=secret")); assertEquals("token=***\n", log.finish());
         assertEquals("", log.append("x".repeat(100_000)));
-        assertEquals("[已略过超长输出]\n正常\n", log.append("\n正常\n"));
+        assertEquals("[Long output omitted]\n正常\n", log.append("\n正常\n"));
     }
 }

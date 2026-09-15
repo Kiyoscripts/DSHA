@@ -118,7 +118,7 @@ public final class TerminalSessionTest {
         terminal.submit("echo next");
         FakeProcess next = backend.opened(1); next.ready();
         await(() -> next.commands.size() == 1);
-        assertTrue(output.toString().contains("发送结果不确定，未自动重发：touch side-effect"));
+        assertTrue(output.toString().contains("Send result uncertain; not resent automatically: touch side-effect"));
         assertTrue(next.commands.get(0).contains("echo next"));
         assertFalse(next.commands.get(0).contains("touch side-effect"));
     }
@@ -167,7 +167,7 @@ public final class TerminalSessionTest {
         terminal.submit("echo retained");
         FakeProcess old = backend.opened(0);
         old.finish();
-        await(() -> output.toString().contains("旧会话已结束"));
+        await(() -> output.toString().contains("Previous session ended"));
         assertEquals(1, backend.processes.size());
         terminal.ensureStarted();
         FakeProcess next = backend.opened(1); next.ready();
@@ -226,7 +226,7 @@ public final class TerminalSessionTest {
         terminal.submit("echo after-maintenance");
         await(() -> terminal.state() == TerminalSession.State.STOPPED);
         assertTrue(old.commands.isEmpty());
-        assertTrue(output.toString().contains("命令尚未发送，已保留"));
+        assertTrue(output.toString().contains("command not sent and retained"));
         backend.environmentBlocked = false;
         terminal.ensureStarted();
         FakeProcess next = backend.opened(1); next.ready();
@@ -298,7 +298,7 @@ public final class TerminalSessionTest {
         assertEquals(1, backend.registry.count());
         assertFalse(terminal.shutdownAndWait(1000));
         assertNull(backend.registry.tryEnterMaintenance());
-        assertTrue(output.toString().contains("保留环境占用"));
+        assertTrue(output.toString().contains("environment remains in use"));
     }
 
     @Test public void realPosixSleepCancellationAndShellState() throws Exception {

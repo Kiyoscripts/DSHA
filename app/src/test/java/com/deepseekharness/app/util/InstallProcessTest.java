@@ -40,7 +40,7 @@ public class InstallProcessTest {
         Process timeout = child("wait");
         IOException error = assertThrows(IOException.class, () -> InstallProcess.read(timeout, 150, true,
                 () -> false, line -> { }, Process::destroyForcibly));
-        assertTrue(error.getMessage().contains("超时")); assertTrue(timeout.waitFor(2, TimeUnit.SECONDS));
+        assertTrue(error.getMessage().contains("timed out")); assertTrue(timeout.waitFor(2, TimeUnit.SECONDS));
         Process callback = child("wait");
         assertThrows(Exception.class, () -> InstallProcess.read(callback, 5000, true, () -> false,
                 line -> { throw new IllegalStateException("回调异常"); }, Process::destroyForcibly));
@@ -50,7 +50,7 @@ public class InstallProcessTest {
         Process process = child("large"); InstallTask task = new InstallTask(); task.start(false, 0);
         assertEquals(0, InstallProcess.read(process, 5000, true, () -> false, task::append, Process::destroyForcibly));
         String log = task.snapshot().log;
-        assertTrue(log.contains("输出行过长")); assertTrue(log.contains("正常尾行")); assertFalse(log.contains("SECRET"));
+        assertTrue(log.contains("Overlong output line")); assertTrue(log.contains("正常尾行")); assertFalse(log.contains("SECRET"));
     }
     @Test public void cancelDoesNotReturnBeforeAsynchronousProcessExit() throws Exception {
         FakeProcess process = new FakeProcess("");

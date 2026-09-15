@@ -82,8 +82,8 @@ public class AdbWheelCacheTest {
         AdbWheelCache.fillMissing(bundled, cache, archive, restored);
         file(site, "a.py", "old installed a");
         IOException error = assertThrows(IOException.class, () -> AdbWheelCache.install(cache, site, stage));
-        assertTrue(error.getMessage().contains("z-1.whl")); assertTrue(error.getMessage().contains("源缓存已保留"));
-        assertTrue(error.getMessage().contains("移出 wheels"));
+        assertTrue(error.getMessage().contains("z-1.whl")); assertTrue(error.getMessage().contains("source cache is preserved"));
+        assertTrue(error.getMessage().contains("wheels directory"));
         assertArrayEquals(before, bytes(broken)); assertEquals("old installed a", text(new File(site, "a.py")));
         assertFalse(new File(site, "z.py").exists()); assertEquals(0, stage.list().length);
         // 模拟用户按诊断说明备份并移走坏文件；生产补缺本身绝不做这一步。
@@ -116,7 +116,7 @@ public class AdbWheelCacheTest {
         File other = wheel(cache, "a-2.whl", "same.py", "version 2");
         byte[] before = bytes(other);
         IOException error = assertThrows(IOException.class, () -> AdbWheelCache.install(cache, site, stage));
-        assertTrue(error.getMessage().contains("文件冲突")); assertTrue(error.getMessage().contains("a-1.whl"));
+        assertTrue(error.getMessage().contains("File conflicts with")); assertTrue(error.getMessage().contains("a-1.whl"));
         assertTrue(error.getMessage().contains("a-2.whl")); assertArrayEquals(before, bytes(other));
         assertEquals(0, site.list().length);
     }

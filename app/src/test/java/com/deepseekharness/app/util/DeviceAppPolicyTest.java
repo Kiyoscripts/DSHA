@@ -22,7 +22,7 @@ public class DeviceAppPolicyTest {
     private static final String SYSTEMS = "package:android uid:1000\npackage:com.android.systemui uid:10101\n";
     @Test public void groupsAreCompleteAndOnlyUserTargetsPass() {
         DeviceAppPolicy.Snapshot apps = DeviceAppPolicy.snapshot(USERS, SYSTEMS);
-        assertEquals(5, apps.apps.size()); assertTrue(apps.grouped().contains("[用户应用]")); assertTrue(apps.grouped().contains("[系统应用]"));
+        assertEquals(5, apps.apps.size()); assertTrue(apps.grouped().contains("[User apps]")); assertTrue(apps.grouped().contains("[System apps]"));
         assertEquals(java.util.Arrays.asList("example.app"), apps.targets(DeviceShellPolicy.inspect("am force-stop example.app"), ""));
         for (String name : new String[]{"android", "com.android.systemui", "com.dsh.client", "absent.app"}) {
             try { apps.targets(DeviceShellPolicy.inspect("am force-stop " + name), ""); fail(name); }

@@ -21,7 +21,7 @@ public class BackupTaskStateTest {
             BackupTaskState state = new BackupTaskState();
             state.restore(42, "恢复", before, "正在恢复");
             assertFalse(state.busy()); assertEquals(BackupTaskState.Status.INTERRUPTED, state.snapshot().status);
-            assertFalse(state.confirm(42)); assertTrue(state.snapshot().detail.contains("未自动重试"));
+            assertFalse(state.confirm(42)); assertTrue(state.snapshot().detail.contains("not retried automatically"));
         }
     }
     @Test public void resultSurvivesNewUiAndCompletedTaskCannotBeOverwrittenByOldCallback() {

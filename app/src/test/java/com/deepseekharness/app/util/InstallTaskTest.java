@@ -34,7 +34,7 @@ public class InstallTaskTest {
         InstallTask task = new InstallTask(); task.start(true, 0);
         task.stage(2, "正在修复", false); assertTrue(task.requestCancel());
         assertFalse(task.requestCancel()); assertFalse(task.snapshot().cancellable);
-        assertTrue(task.snapshot().log.contains("安全收尾"));
+        assertTrue(task.snapshot().log.contains("finish safely"));
         assertThrows(InstallTask.Cancelled.class, () -> task.stage(4, "不应执行", false));
         task.finish(InstallTask.Outcome.CANCELLED, "已停止"); assertFalse(task.snapshot().busy());
     }
@@ -54,14 +54,14 @@ public class InstallTaskTest {
         task.append("-----END PRIVATE KEY-----"); task.append("后续正常输出");
         String log = task.snapshot().log;
         for (String secret : new String[]{"sk-supersecret123456", "p455", "abc123", "xyz123", "base64-private-material"}) assertFalse(log, log.contains(secret));
-        assertTrue(log.contains("后续正常输出")); assertTrue(log.contains("私钥已隐藏"));
+        assertTrue(log.contains("后续正常输出")); assertTrue(log.contains("Private key hidden"));
     }
     @Test public void logKeepsBoundedTailAndHidesWholeOversizedLines() {
         InstallTask task = new InstallTask(); task.start(false, 0);
         task.append("password='" + "s".repeat(5000) + "'");
-        assertTrue(task.snapshot().log.contains("输出行过长"));
+        assertTrue(task.snapshot().log.contains("Overlong output line"));
         for (int i = 0; i < 500; i++) task.append("行" + i + " " + "x".repeat(200));
         String log = task.snapshot().log; assertTrue(log.length() < 50 * 1024);
-        assertTrue(log.contains("较早输出已省略")); assertTrue(log.contains("行499")); assertFalse(log.contains("行0 "));
+        assertTrue(log.contains("Earlier output omitted")); assertTrue(log.contains("行499")); assertFalse(log.contains("行0 "));
     }
 }

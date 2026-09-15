@@ -43,7 +43,7 @@ public class ResumableDownloadTest {
     @Test public void mismatchedRangePreservesExistingPartial() throws Exception {
         File partial = temp.newFile(); byte[] before = Arrays.copyOf(data, 7); Files.write(partial.toPath(), before);
         try { ResumableDownload.transfer(partial, data.length, hash(), offset -> response(206, data, "bytes 0-1/2"), progress); fail(); }
-        catch (IOException expected) { assertTrue(expected.getMessage().contains("范围")); }
+        catch (IOException expected) { assertTrue(expected.getMessage().contains("resume range")); }
         assertArrayEquals(before, Files.readAllBytes(partial.toPath()));
     }
     @Test public void corruptedExistingPrefixIsRejectedAfterResume() throws Exception {

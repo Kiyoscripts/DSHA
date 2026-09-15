@@ -21,14 +21,14 @@ public class FileIntegrityTest {
         try {
             FileIntegrity.copy(new ByteArrayInputStream(new byte[4]), new ByteArrayOutputStream(), 3);
             fail("必须拒绝超限输入");
-        } catch (IOException expected) { assertTrue(expected.getMessage().contains("大小")); }
+        } catch (IOException expected) { assertTrue(expected.getMessage().contains("allowed size")); }
     }
     @Test public void interruptedCopyFails() throws Exception {
         Thread.currentThread().interrupt();
         try {
             FileIntegrity.copy(new ByteArrayInputStream(new byte[1]), null, 10);
             fail("必须响应中断");
-        } catch (IOException expected) { assertTrue(expected.getMessage().contains("取消")); }
+        } catch (IOException expected) { assertTrue(expected.getMessage().contains("canceled")); }
         finally { Thread.interrupted(); }
     }
 }

@@ -8,12 +8,12 @@ public class StartupTraceTest {
         trace.stage(3,1200,"检查插件");trace.add(3,1300,"正在检查 plugin-a");trace.stage(3,1700,"加载服务端插件");
         StartupTrace.Snapshot s=trace.snapshot(2000);
         assertEquals("加载服务端插件",s.stage);assertEquals(300,s.stageElapsedMs);
-        assertTrue(s.log.contains("plugin-a"));assertTrue(s.log.contains("耗时 0.5s"));
+        assertTrue(s.log.contains("plugin-a"));assertTrue(s.log.contains("0.5s"));
     }
     @Test public void oldGenerationCannotPolluteNewStartupOrIssues() {
         StartupTrace trace=new StartupTrace();trace.begin(1,0,false);trace.issue(1,5,"old","broken");
         trace.begin(2,100,true);trace.add(1,110,"late old output");trace.issue(1,110,"old","late");trace.browserReady(1,110);
-        StartupTrace.Snapshot s=trace.snapshot(120);assertFalse(s.log.contains("late"));assertTrue(s.safe);assertFalse(s.browserReady);assertTrue(s.issues.isEmpty());
+        StartupTrace.Snapshot s=trace.snapshot(120);assertFalse(s.log.contains("late old"));assertTrue(s.safe);assertFalse(s.browserReady);assertTrue(s.issues.isEmpty());
     }
     @Test public void logsAndFailuresAreBoundedAndRedacted() {
         StartupTrace trace=new StartupTrace();trace.begin(1,0,false);

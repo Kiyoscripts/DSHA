@@ -17,7 +17,7 @@ public class TextLogTailTest {
     }
     @Test public void largeFileKeepsOnlyLatestOutput() throws Exception {
         String tail = TextLogTail.read(log("earlier".repeat(100000) + "\nLAST_FAILURE\n"), 128);
-        assertTrue(tail.startsWith("（较早输出已省略"));
+        assertTrue(tail.startsWith("(earlier output omitted"));
         assertTrue(tail.endsWith("LAST_FAILURE\n"));
         assertTrue(tail.length() < 200);
     }

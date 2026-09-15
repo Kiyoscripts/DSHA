@@ -38,7 +38,7 @@ public class ProcessTerminationTest {
         Child child = new Child();
         IllegalStateException error = assertThrows(IllegalStateException.class,
                 () -> ProcessTermination.stop(child, child::destroy, child::destroy, 10, 20));
-        assertTrue(child.alive); assertTrue(error.getMessage().contains("仍未退出"));
+        assertTrue(child.alive); assertTrue(error.getMessage().contains("has not exited"));
     }
     @Test public void interruptedCleanupStillWaitsAndRestoresInterruptFlag() throws Exception {
         Child child = new Child();
