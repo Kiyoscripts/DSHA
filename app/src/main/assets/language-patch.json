@@ -9,7 +9,7 @@
     },
     {
       "before": "resolveActive() {\n\t\t\t\tif (this.preference === void 0) return this.provisional;",
-      "after": "resolveActive() {\n                if (typeof window !== \"undefined\" && (window.__DSHA_LANGUAGE__ === \"zh\" || window.__DSHA_LANGUAGE__ === \"en\")) return window.__DSHA_LANGUAGE__;\n\t\t\t\tif (this.preference === void 0) return this.provisional;"
+      "after": "resolveActive() {\n                if (typeof window !== \"undefined\" && (window.__DSHA_LANGUAGE__ === \"zh\" || window.__DSHA_LANGUAGE__ === \"en\")) return window.__DSHA_LANGUAGE__;\n\t\t\t\tif (this.preference === void 0) return window.__DSHA_LANGUAGE__ === \"zh\" ? this.provisional : \"en\";"
     },
     {
       "before": "this.preference = match.id;\n\t\t\t\tif (this.snapshot.active !== match.id)",

@@ -3,7 +3,7 @@ import org.junit.After;
 import org.junit.Test;
 import static org.junit.Assert.*;
 public class UiTextTest {
-    @After public void restore(){UiText.setLanguage("zh");}
+    @After public void restore(){UiText.setLanguage("en");}
     @Test public void englishCatalogContainsCompleteTranslations() {
         assertTrue(UiMessages.EN.size()>2000);
         for(var item:UiMessages.EN.entrySet()){

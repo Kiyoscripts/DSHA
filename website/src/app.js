@@ -32,11 +32,11 @@
   function themeLabel() {
     var dark = root.getAttribute('data-theme') === 'dark';
     if (themeButton) {
-      themeButton.setAttribute('aria-label', dark ? '切换浅色模式' : '切换深色模式');
+      themeButton.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
       themeButton.setAttribute('aria-pressed', String(dark));
-      themeButton.setAttribute('title', dark ? '当前为夜间模式，点击切换到日间' : '当前为日间模式，点击切换到夜间');
+      themeButton.setAttribute('title', dark ? 'Dark mode is on. Tap to switch to light mode.' : 'Light mode is on. Tap to switch to dark mode.');
       var label = document.querySelector('[data-theme-label]');
-      if (label) label.textContent = dark ? '夜间' : '日间'; else themeButton.textContent = dark ? '☾ 夜间' : '☀ 日间';
+      if (label) label.textContent = dark ? 'Dark' : 'Light'; else themeButton.textContent = dark ? '☾ Dark' : '☀ Light';
     }
     var meta = document.querySelector('meta[name=theme-color]'); if (meta) meta.setAttribute('content', dark ? '#070c14' : '#edf3fc');
   }
@@ -53,15 +53,15 @@
   function fallbackCopy(value, source) {
     var input = source && source.tagName === 'INPUT' ? source : document.createElement('textarea');
     var temporary = input !== source;
-    if (temporary) { input.value = value; input.setAttribute('aria-label','待复制内容'); input.style.position = 'fixed'; input.style.left = '-9999px'; document.body.appendChild(input); }
+    if (temporary) { input.value = value; input.setAttribute('aria-label','Content to copy'); input.style.position = 'fixed'; input.style.left = '-9999px'; document.body.appendChild(input); }
     if (!temporary) input.hidden = false;
     input.focus(); input.select(); var copied = false;
     try { copied = document.execCommand('copy'); } catch (e) {}
     if (temporary) document.body.removeChild(input);
-    if (copied) announce('已复制'); else { if (source) { source.focus(); source.select(); } announce('自动复制不可用，请选中页面中的内容手动复制。'); }
+    if (copied) announce('Copied'); else { if (source) { source.focus(); source.select(); } announce('Automatic copy is unavailable. Select the content on the page and copy it manually.'); }
   }
   function copy(value, source) {
-    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(value).then(function () { announce('已复制'); },function () { fallbackCopy(value, source); });
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(value).then(function () { announce('Copied'); },function () { fallbackCopy(value, source); });
     else fallbackCopy(value, source);
   }
   Array.prototype.forEach.call(document.querySelectorAll('[data-copy-target]'), function (button) {
@@ -103,7 +103,7 @@
         var matches = (kind.value === 'all' || kind.value === card.getAttribute('data-kind')) && (category.value === 'all' || category.value === card.getAttribute('data-category')) && terms.every(function (term) { return content.indexOf(term) !== -1; });
         card.hidden = !matches; if (matches) count++;
       });
-      summary.textContent = '显示 ' + count + ' / ' + cards.length + ' 个条目'; empty.hidden = count !== 0;
+      summary.textContent = 'Showing ' + count + ' / ' + cards.length + ' entries'; empty.hidden = count !== 0;
       if (sync) updateUrl();
     }
     var timer;
@@ -119,16 +119,16 @@
     var value = function (name) { return form.elements[name].value.trim(); };
     var required = ['name','source','version','license','description','permissions','tested'];
     for (var i = 0; i < required.length; i++) {
-      if (!value(required[i])) { announce('请完整填写投稿必填项，内容不能只有空格。'); form.elements[required[i]].focus(); return; }
+      if (!value(required[i])) { announce('Please complete every required field. Values cannot be only spaces.'); form.elements[required[i]].focus(); return; }
     }
-    var lines = ['## 市场收录申请','', '- 名称：' + value('name'), '- 类型：' + value('kind'), '- 源码：' + value('source'), '- 发布版本：' + value('version'), '- 发布包：' + (value('artifact') || '见源码说明'), '- 许可证：' + value('license'), '', '### 用途',value('description'), '', '### 依赖、数据与权限',value('permissions'), '', '### DSHA 测试记录',value('tested'), '', '请维护者审核后收录；此申请不表示插件已通过审核。'];
+    var lines = ['## Marketplace listing request','', '- Name: ' + value('name'), '- Type: ' + value('kind'), '- Source: ' + value('source'), '- Release version: ' + value('version'), '- Release package: ' + (value('artifact') || 'See the source notes'), '- License: ' + value('license'), '', '### What it does',value('description'), '', '### Dependencies, data, and permissions',value('permissions'), '', '### DSHA test record',value('tested'), '', 'Please review this request before listing it. Submitting does not mean the plugin has been approved.'];
     var body = lines.join('\n'), preview = document.querySelector('[data-submission-preview]'); preview.textContent = body;
     var link = document.querySelector('[data-submit-link]');
-    var base = 'https://github.com/qiannianhuanxiang/DSHA/issues/new?title=' + encodeURIComponent('[插件市场收录] ' + value('name'));
+    var base = 'https://github.com/qiannianhuanxiang/DSHA/issues/new?title=' + encodeURIComponent('[Marketplace listing] ' + value('name'));
     var complete = base + '&body=' + encodeURIComponent(body), longBody = complete.length > 6500;
     link.href = longBody ? base : complete;
-    link.textContent = longBody ? '前往 GitHub（请先复制正文）' : '前往 GitHub 提交';
-    var result = document.querySelector('[data-submit-result]'); result.hidden = false; result.focus(); announce(longBody ? '投稿较长，请复制正文，再前往 GitHub 粘贴提交。' : '投稿内容已生成，请核对后前往 GitHub 提交。');
+    link.textContent = longBody ? 'Open GitHub (copy the body first)' : 'Open GitHub to submit';
+    var result = document.querySelector('[data-submit-result]'); result.hidden = false; result.focus(); announce(longBody ? 'This submission is long. Copy the body, then paste it on GitHub.' : 'The submission draft is ready. Review it, then submit on GitHub.');
   });
   root.className += ' js';
 })();

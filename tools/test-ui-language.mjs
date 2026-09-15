@@ -16,7 +16,7 @@ test('原生语言通过 locale 服务切换，双向变化可订阅且能清理
  const window={__DSHA_LANGUAGE__:'en',addEventListener:(k,v)=>handlers.set(k,v),removeEventListener:(k)=>handlers.delete(k)};
  const document={documentElement:{lang:'zh'},body:{textContent:'用户的中文对话保持原文'}};
  const context=vm.createContext({window,document});vm.runInContext(helper,context);
- const dispose=context.installDshaLanguageBridge({getSnapshot:()=>({active}),setLocale:id=>{calls.push(id);active=id;}});
+ const dispose=context.installDshaLanguageBridge({getSnapshot:()=>({active}),preference:undefined,setLocale:id=>{calls.push(id);active=id;}});
  assert.deepEqual(calls,['en']);assert.equal(document.documentElement.lang,'en');
  window.__DSHA_LANGUAGE__='zh';handlers.get('dsha-language')();assert.deepEqual(calls,['en','zh']);
  window.__DSHA_LANGUAGE__='invalid';handlers.get('dsha-language')();assert.equal(calls.length,2);
@@ -30,5 +30,14 @@ test('较晚到达的旧 Host 偏好不能覆盖原生语言',()=>{
  const context=vm.createContext({window:{__DSHA_LANGUAGE__:'en'},localeKey:x=>x});
  const resolve=vm.runInContext('(function(){'+method+'})',context);
  const state={preference:'zh',provisional:'zh',catalog:new Map([['zh',{id:'zh'}],['en',{id:'en'}]])};
- assert.equal(resolve.call(state),'en');delete context.window.__DSHA_LANGUAGE__;assert.equal(resolve.call(state),'zh');
+ assert.equal(resolve.call(state),'en');delete context.window.__DSHA_LANGUAGE__;assert.equal(resolve.call(state),'en');
+});
+test('无原生语言时默认英文，不跟随中文系统语言',()=>{
+ const method=source.match(/resolveActive\(\) \{([\s\S]*?)\n\t\t\t\}/)[1];
+ const context=vm.createContext({window:{},localeKey:x=>x});
+ const resolve=vm.runInContext('(function(){'+method+'})',context);
+ const state={preference:undefined,provisional:'zh',catalog:new Map([['zh',{id:'zh'}],['en',{id:'en'}]])};
+ assert.equal(resolve.call(state),'en');
+ context.window.__DSHA_LANGUAGE__='zh';
+ assert.equal(resolve.call(state),'zh');
 });

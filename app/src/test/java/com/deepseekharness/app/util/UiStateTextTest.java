@@ -3,7 +3,7 @@ import org.junit.After;
 import org.junit.Test;
 import static org.junit.Assert.*;
 public class UiStateTextTest {
-    @After public void reset(){UiText.setLanguage("zh");}
+    @After public void reset(){UiText.setLanguage("en");}
     @Test public void cachedPluginResultFollowsBothLanguageChanges() {
         String zh="插件检测完成；新检测到的插件可开启开关加入 Web，变更后重启 Web 生效";
         UiText.setLanguage("en");String cached=UiText.text(zh);assertNotEquals(zh,cached);

@@ -2,7 +2,7 @@ package com.deepseekharness.app.util;
 
 /** 运行时文案与 XML 资源共用应用语言；此层不访问 Android 或用户文件。 */
 public final class UiText {
-    private static volatile String language = "zh";
+    private static volatile String language = "en";
     private UiText() { }
     public static void setLanguage(String value) { language=UiLanguagePreference.normalize(value); }
     public static String language() { return language; }

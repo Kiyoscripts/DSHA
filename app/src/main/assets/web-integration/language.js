@@ -5,7 +5,7 @@ function installDshaLanguageBridge(locale) {
     const apply = () => {
         const language = window.__DSHA_LANGUAGE__;
         if (!valid(language)) return;
-        if (locale.getSnapshot().active !== language) locale.setLocale(language);
+        locale.setLocale(language);
         document.documentElement.lang = language;
     };
     window.addEventListener('dsha-language', apply);

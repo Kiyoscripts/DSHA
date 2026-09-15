@@ -43,7 +43,7 @@ public class ConfigStore {
         return com.deepseekharness.app.util.UiThemePreference.normalize(text("ui_theme", "system"));
     }
     public String getUiLanguage() {
-        return com.deepseekharness.app.util.UiLanguagePreference.normalize(text("ui_language", "zh"));
+        return com.deepseekharness.app.util.UiLanguagePreference.normalize(text("ui_language", "en"));
     }
     public void setUiLanguage(String value) {
         prefs.edit().putString("ui_language", com.deepseekharness.app.util.UiLanguagePreference.normalize(value)).apply();

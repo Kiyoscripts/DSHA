@@ -1,6 +1,6 @@
 {
   "manifest_version": 2,
-  "name": "DSHA 页面返回",
+  "name": "DSHA page back",
   "version": "1.5",
   "browser_specific_settings": {
     "gecko": {

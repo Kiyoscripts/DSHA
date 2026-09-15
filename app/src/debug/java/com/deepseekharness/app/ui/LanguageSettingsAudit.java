@@ -53,11 +53,11 @@ public final class LanguageSettingsAudit extends Instrumentation {
         try{
             try(var fd=getUiAutomation().executeShellCommand("am start -W -n com.dsh.client/com.deepseekharness.app.ui.MainActivity");var input=new android.os.ParcelFileDescriptor.AutoCloseInputStream(fd)){while(input.read()!=-1){}}
             long end=System.currentTimeMillis()+120000;while(com.deepseekharness.app.BackupManager.isEnvironmentTaskBusy()&&System.currentTimeMillis()<end)Thread.sleep(200);
-            ui(()->{new ConfigStore(app).setUiLanguage("zh");LanguageController.apply(app);});
+            ui(()->{new ConfigStore(app).setUiLanguage("en");LanguageController.apply(app);});
             ActivityMonitor monitor=addMonitor(FragmentSessionTestActivity.class.getName(),null,false);ui(()->app.startActivity(new Intent(app,FragmentSessionTestActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)));
             page=(FragmentSessionTestActivity)waitForMonitorWithTimeout(monitor,15000);removeMonitor(monitor);check(page!=null,"测试宿主未打开");
-            mount(new SettingsFragment());check(((TextView)page.findViewById(R.id.settings_language)).getText().toString().contains("简体中文"),"默认中文未显示");
-            choose("English");check("en".equals(new ConfigStore(app).getUiLanguage()),"英语选择未保存");
+            mount(new SettingsFragment());check(((TextView)page.findViewById(R.id.settings_language)).getText().toString().contains("English"),"默认英文未显示");
+            check("en".equals(new ConfigStore(app).getUiLanguage()),"默认英语未保存");
             check("Settings".equals(page.getString(R.string.nav_settings)),"资源没有切换成英文");
             for(androidx.fragment.app.Fragment fragment:new androidx.fragment.app.Fragment[]{new SettingsFragment(),new ConfigFragment(),new WorkspaceFragment(),new InstallFragment(),new DeviceGrantsFragment(),new PluginFragment()}){
                 mount(fragment);ui(()->scan(fragment.requireView(),fragment.getClass().getSimpleName()));

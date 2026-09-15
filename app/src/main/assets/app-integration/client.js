@@ -8,7 +8,7 @@ window.__ModuleLoader__.load({id:'dsh-app-integration', factory: () => {
       req.onupgradeneeded = () => req.result.createObjectStore('drafts',{keyPath:'id'});
       req.onsuccess = () => resolve(req.result);
       req.onerror = () => reject(req.error);
-      req.onblocked = () => reject(new Error('图片草稿存储正在被其他页面使用'));
+      req.onblocked = () => reject(new Error(window.__DSHA_LANGUAGE__ === 'en' ? 'Image draft storage is in use by another page' : '图片草稿存储正在被其他页面使用'));
     });
   }
   function attachmentIds(shell) { return Array.from(shell.state.getSnapshot().attachmentIds || []); }
@@ -20,7 +20,7 @@ window.__ModuleLoader__.load({id:'dsh-app-integration', factory: () => {
   function writeDraft(db, record, currentRevision) {
     return new Promise((resolve,reject) => {
       const tx = db.transaction('drafts','readwrite'), store = tx.objectStore('drafts');
-      tx.oncomplete = resolve; tx.onerror = () => reject(tx.error); tx.onabort = () => reject(tx.error || new Error('图片草稿存储已取消'));
+      tx.oncomplete = resolve; tx.onerror = () => reject(tx.error); tx.onabort = () => reject(tx.error || new Error(window.__DSHA_LANGUAGE__ === 'en' ? 'Image draft storage was canceled' : '图片草稿存储已取消'));
       const all = store.getAll();
       all.onsuccess = () => {
         if (currentRevision() !== record.revision) return;
@@ -35,7 +35,7 @@ window.__ModuleLoader__.load({id:'dsh-app-integration', factory: () => {
     let loading = true, changed = false, previous = JSON.stringify(attachmentIds(shell)), disposed = false;
     const key = prefix + id;
     let warned = false;
-    const warn = () => { if (!warned) { warned = true; shell.notify?.('error','图片草稿未能保存到本机，退出前请保留原图并检查存储空间。'); } };
+    const warn = () => { if (!warned) { warned = true; shell.notify?.('error', window.__DSHA_LANGUAGE__ === 'en' ? 'Image drafts could not be saved on this device. Keep the original images and check storage before leaving.' : '图片草稿未能保存到本机，退出前请保留原图并检查存储空间。'); } };
     const save = () => {
       try {
         const attachments = conversation.resolveDraftAttachments(attachmentIds(shell)).filter(a => a.kind === 'image');
@@ -44,7 +44,7 @@ window.__ModuleLoader__.load({id:'dsh-app-integration', factory: () => {
         storage.setItem(key,revision);
         const files = attachments.map(a => ({blob:a.file,name:a.file.name,type:a.file.type,lastModified:a.file.lastModified}));
         const bytes = files.reduce((sum,f) => sum + f.blob.size,0);
-        if (files.length > 20 || bytes > LIMIT) throw new Error('图片草稿太大');
+        if (files.length > 20 || bytes > LIMIT) throw new Error(window.__DSHA_LANGUAGE__ === 'en' ? 'Image draft is too large' : '图片草稿太大');
         writeDraft(db,{id,revision,files,bytes},() => storage.getItem(key)).catch(warn);
       } catch { warn(); }
     };
@@ -171,7 +171,7 @@ window.__ModuleLoader__.load({id:'dsh-app-integration', factory: () => {
         for (const [id,entry] of entries) if (shells.get(id) !== entry.shell) { entry.active = false; entry.off?.(); entries.delete(id); }
       };
       openDatabase().then(database => { if (!alive) database.close(); else { db = database; scan(); } }).catch(() => {
-        if (!warned) { warned = true; ctx.conversation.input.shells?.values().next().value?.notify?.('error','图片草稿存储不可用，退出前请保留原图。'); }
+        if (!warned) { warned = true; ctx.conversation.input.shells?.values().next().value?.notify?.('error', window.__DSHA_LANGUAGE__ === 'en' ? 'Image draft storage is unavailable. Keep the original images before leaving.' : '图片草稿存储不可用，退出前请保留原图。'); }
       });
       const timer = setInterval(scan,250);
       return () => { alive = false; clearInterval(timer); for (const entry of entries.values()) { entry.active = false; entry.off?.(); }

@@ -76,7 +76,7 @@ test('无效和重复参数不能唤起；错误输入不能恢复旧入口', ()
 test('过长二维码不截断来源，提供完整复制回退', () => {
   const url='https://example.com/'+ 'a'.repeat(1600);
   const p=page('/install/?'+query({url}));
-  try {assert.equal(p.$('[data-install-qr]').children.length,0);assert.match(p.$('[data-install-qr-note]').textContent,/复制/);assert.equal(new URL(p.$('#install-share-url').value).searchParams.get('url'),url);} finally {p.w.close();}
+  try {assert.equal(p.$('[data-install-qr]').children.length,0);assert.match(p.$('[data-install-qr-note]').textContent,/Copy/);assert.equal(new URL(p.$('#install-share-url').value).searchParams.get('url'),url);} finally {p.w.close();}
 });
 test('复制权限失败后保留可选择的完整安装链接', async () => {
   const p=page('/install/?'+query(original));
@@ -87,7 +87,7 @@ test('复制权限失败后保留可选择的完整安装链接', async () => {
     p.$('[data-copy-target="install-share-url"]').click(); await new Promise(r=>setTimeout(r,0));
     assert.equal(p.w.document.activeElement,p.$('#install-share-url'));
     assert.equal(p.$('#install-share-url').selectionEnd,p.$('#install-share-url').value.length);
-    assert.match(p.$('[data-toast]').textContent,/手动复制/);
+    assert.match(p.$('[data-toast]').textContent,/copy it manually/);
   } finally {p.w.close();}
 });
 test('搜索空结果、重置、类别和历史回退保持页面与地址一致', async () => {
@@ -112,7 +112,7 @@ test('导航展开、链接收起、Escape 恢复焦点；无 JS 仍有完整导
     button.click();nav.querySelector('a').click();assert.equal(button.getAttribute('aria-expanded'),'false');
     assert.equal(offline.w.document.documentElement.classList.contains('js'),false);
     assert.equal(offline.$('[data-navigation]').querySelectorAll('a').length,5);
-    assert.ok(offline.$('a[href="/download/"]'));assert.match(offline.$('noscript').textContent,/粘贴到 App/);
+    assert.ok(offline.$('a[href="/download/"]'));assert.match(offline.$('noscript').textContent,/paste the plugin link into the app marketplace/);
     assert.equal(offline.$('[data-navigation]').hidden,false);
   } finally {p.w.close();offline.w.close();}
 });
