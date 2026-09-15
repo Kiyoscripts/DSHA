@@ -47,9 +47,18 @@ jobs:
       - name: Restore verified full offline assets
         run: |
           set -euo pipefail
-          curl --fail --location --retry 3 \
-            --output /tmp/dsha-official.apk \
-            https://github.com/DSH-APP/DSHA/releases/download/v0.1.5-rc2/dsha-0.1.5-rc2.apk
+          download() {
+            curl --fail --location --retry 8 --retry-all-errors --retry-delay 5 \
+              --retry-max-time 180 --connect-timeout 20 \
+              --user-agent 'dsha-ci' \
+              --header "$1" \
+              --output /tmp/dsha-official.apk \
+              "$2"
+          }
+          download 'Accept: application/octet-stream' \
+            https://github.com/DSH-APP/DSHA/releases/download/v0.1.5-rc2/dsha-0.1.5-rc2.apk \
+            || download 'Accept: application/octet-stream' \
+            https://api.github.com/repos/DSH-APP/DSHA/releases/assets/559050729
           printf '%s  %s\n' \
             85cb7c7213681ced654788f940b16313b3b5e2b662add87432ede95446a30658 \
             /tmp/dsha-official.apk | sha256sum --check --strict
