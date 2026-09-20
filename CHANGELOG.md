@@ -2,6 +2,14 @@
 
 > 只记面向用户的变化。完整历史见 [commit log](https://github.com/qiannianhuanxiang/DSHA/commits/main)。
 
+### 未发布
+
+- 修复第三方插件无法识别 DSHA 宿主的问题：启动 dsh Web 时补注入 `DSHA_APP=1`。
+  此前 DSHA 只注入 `DSHA_UI_LANGUAGE` / `DSHA_STARTUP_PROFILE` / `DSHA_WEB_GENERATION` 等变量，
+  依赖 `DSHA_APP` 判断宿主的插件（如 dsh-purge）会把 DSHA 误判为独立 dsh Web，
+  进而去改写本 App 的启动器与 `/root/dsh-bin` 守卫包装，或自行重启/重装 Web。
+  所有 dsh 启动路径（web 与恢复 profile）共用同一处命令组装，故此修复一并生效。
+
 ### v0.1.5-rc2 / v0.1.5-rc2low（正式版）
 
 由贡献者 [@ym2025szz](https://github.com/ym2025szz) 发布，版本码 **129**，dsh **0.1.5-rc.2**，Ubuntu 基础环境 **10**，沿用原发布签名。完整内容见[正式版说明与历史对比](docs/releases/v0.1.5-rc2-notes.md)。

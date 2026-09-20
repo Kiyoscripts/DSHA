@@ -176,6 +176,9 @@ public class HarnessController {
                 + "export DSHA_UI_LANGUAGE=" + ShellQuote.arg(config.getUiLanguage()) + " && "
                 + "export DSHA_STARTUP_PROFILE=" + ShellQuote.arg(profile) + " && "
                 + "export DSHA_WEB_GENERATION=" + getWebGeneration() + " && "
+                // 宿主身份标记：第三方插件据此区分 DSHA 与独立 dsh Web，
+                // 避免它们改写本 App 的启动器/守卫包装或重装自身。
+                + "export DSHA_APP=1 && "
                 + "cd /root && "
                 + "rm -f " + WebProcSel.IDENTITY_WEB + "; echo $$ > " + WebProcSel.PID_WEB + " 2>/dev/null; "
                 // 先写 PID 再查哨兵：停止方先写哨兵再读 PID，两边不会同时漏过。
