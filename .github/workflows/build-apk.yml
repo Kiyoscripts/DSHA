@@ -69,6 +69,10 @@ jobs:
           DSHA_PYTHON: python3
         run: ./gradlew :app:testStandardDebugUnitTest --no-daemon
 
+      - name: Run Python asset tests
+        run: |
+          python3 tools/test-permission-guard.py
+
       - name: Build debug APKs
         env:
           DSHA_PYTHON: python3

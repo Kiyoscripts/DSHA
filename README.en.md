@@ -261,6 +261,26 @@ Listed up front so you don't discover them after installing:
 
 ---
 
+## Third-party plugin compatibility contract
+
+A few constraints govern the boundary between the bundled dsh and plugins. Plugin authors and anyone debugging a broken plugin can work from this table.
+
+| Contract | Notes |
+|---|---|
+| Host marker | DSHA exports `DSHA_APP=1` when it starts Web, alongside `DSHA_WEB_GENERATION` / `DSHA_STARTUP_PROFILE` / `DSHA_UI_LANGUAGE`, which only this app sets. Use them to tell the DSHA container apart from a standalone dsh Web — don't rely on a single variable |
+| Process lifecycle | The app owns Web: PID identity, the watchdog, the auth link and the port all belong to `WebProcessManager`. Plugins must **not** restart Web themselves, spawn detached processes, or kill it — send the user back to the Launch page instead |
+| Plugin management | Install, enable, disable, update and removal all happen in the app's plugin manager. Don't bypass it by editing `dsh.profile.bundles` or overwriting the plugin's own entity |
+| Permission presets | `sandbox-policy.mode` and `approval.policy` must compose to an entry in the `dsh-permission-presets` table (`read-only` / `workspace-write` / `danger-full-access`). DSHA pins a `defaultPreset` fallback in the web profile's user patch layer; plugins still must not delete or rewrite `DSH_PERMISSION_MODE`, nor change only one of the two rows |
+| Runtime directories | The offline runtime is managed and read-only; DSHA's own launchers and the `/root/dsh-bin` guard wrappers (`adb` / `rm` / `dd`) must not be rewritten by plugins |
+
+**If Web won't start after enabling a plugin:**
+
+1. Open the app's **startup recovery page** (clear startup failures route there automatically), or check the maintenance page for the last failure reason.
+2. Disable or remove the plugin you just enabled, then restart Web.
+3. Errors like `@deepseek-ai/dsh-base: composed sandbox and approval defaults match no preset` belong to the "Permission presets" row above; disabling the plugin restores startup.
+
+---
+
 ## Architecture
 
 ```

@@ -80,6 +80,43 @@ PROFILE_WORKSPACE_TEMPLATE = (
     "autoInstallPeers: false\n"
 )
 
+# 权限兜底：固定 defaultPreset，使「组合出的 sandbox/approval」永远能对上
+# dsh-permission-presets 的 presets 表。
+#
+# 背景：dsh-base 的两行分别求值
+#   sandbox-policy.mode : process.env.DSH_PERMISSION_MODE ?? 'workspace-write'
+#   approval.policy     : (同上表达式) === 'danger-full-access' ? 'never' : 'ask'
+# 二者必须组成表内的一项（read-only / workspace-write / danger-full-access）。
+# 第三方插件若改了其中一行、或删掉 DSH_PERMISSION_MODE 让两侧落到不同兜底值，
+# PermissionPresetService 就会抛
+#   "composed sandbox and approval defaults match no preset"
+# 导致 @deepseek-ai/dsh-base 加载失败，整个 Web 起不来。
+# 本行把 defaultPreset 也表达成同一变量的函数，因此任何取值都与两行保持一致。
+#
+# 注意：defaultPreset 只决定「新会话的默认预设」，不影响会话内切换——
+# permission-presets 的 derive() 以 session 事件状态（state.*）优先。
+# 所以这里不会锁死设置页。
+PERMISSION_GUARD_MARKER = "DSHA_PERMISSION_PRESET_GUARD_V1"
+PERMISSION_GUARD_BLOCK = (
+    "# " + PERMISSION_GUARD_MARKER + "\n"
+    "# 由 DSHA 维护：给 permission 行钉一个与 sandbox/approval 同源的 defaultPreset，\n"
+    "# 避免第三方插件改写组合后落到表外的 \"custom\" 而使 Web 无法启动。\n"
+    "- id: permission\n"
+    "  config:\n"
+    "    presets:\n"
+    "      read-only:\n"
+    "        sandbox: read-only\n"
+    "        approval: ask\n"
+    "      workspace-write:\n"
+    "        sandbox: workspace-write\n"
+    "        approval: ask\n"
+    "      danger-full-access:\n"
+    "        sandbox: danger-full-access\n"
+    "        approval: never\n"
+    "    defaultPreset: !!js \"(function(){var m = process.env.DSH_PERMISSION_MODE ?? 'danger-full-access';"
+    " return m === 'read-only' ? 'read-only' : (m === 'danger-full-access' ? 'danger-full-access' : 'workspace-write');})()\"\n"
+)
+
 
 def local(path):
     """容器内绝对路径 → 本地文件系统路径（测试用 DSHA_TEST_ROOT 前缀）。"""
@@ -365,6 +402,36 @@ def write_manifest(doc):
     os.replace(tmp, local(MANIFEST))
 
 
+def ensure_permission_guard():
+    """在 profile 的补丁层里保证权限兜底行存在。
+
+    该文件是「用户补丁层」，在 bundle 层之后应用（later wins），
+    所以这一行会覆盖 dsh-base 的 permission 行，钉住 defaultPreset。
+    幂等：已含标记则跳过，不覆盖用户在别处写的内容。
+    """
+    path = local(PATCH_FILE)
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            text = f.read()
+    except OSError:
+        return False
+    if PERMISSION_GUARD_MARKER in text:
+        return False
+    base = text.rstrip("\n")
+    # 空补丁层是 "[]"，需要换成真正的列表再追加条目。
+    if base.strip() == "[]" or base.strip() == "":
+        updated = PERMISSION_GUARD_BLOCK
+    else:
+        updated = base + "\n" + PERMISSION_GUARD_BLOCK
+    tmp = path + ".dsha-guard-tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        f.write(updated)
+        f.flush()
+        os.fsync(f.fileno())
+    os.replace(tmp, path)
+    return True
+
+
 def ensure_profile_files():
     """新建 profile 时补齐 dsh initProfile 会写的三个文件（已是 dsh 模板就跳过）。"""
     os.makedirs(local(PROFILE), exist_ok=True)
@@ -374,6 +441,7 @@ def ensure_profile_files():
     if not os.path.isfile(local(WORKSPACE)):
         with open(local(WORKSPACE), "w", encoding="utf-8") as f:
             f.write(PROFILE_WORKSPACE_TEMPLATE)
+    ensure_permission_guard()
 
 
 def new_manifest(registered):

@@ -251,6 +251,26 @@ DSHA 不只是「能跑起来」。下面每一项都是实装的功能。
 
 ---
 
+## 第三方插件兼容契约
+
+内置 dsh 与插件的交界处有几条约束，插件作者和遇到问题的用户都可以照这张表排查。
+
+| 契约 | 说明 |
+|---|---|
+| 宿主标记 | DSHA 启动 Web 时会注入 `DSHA_APP=1`，另有 `DSHA_WEB_GENERATION` / `DSHA_STARTUP_PROFILE` / `DSHA_UI_LANGUAGE` 等只由本 App 设置的变量。插件据此区分「DSHA 容器」与「独立 dsh Web」，不要只认其中一个变量 |
+| 进程生命周期 | Web 由 App 托管：PID 身份、看门狗、鉴权链接、端口都由 `WebProcessManager` 负责。插件**不要**自行重启、派生游离进程或结束 Web —— 请引导用户回启动页操作 |
+| 插件管理 | 安装、启用、禁用、更新、删除都在 App 的插件管理里做；插件不要绕过它改 `dsh.profile.bundles` 或覆盖自身实体 |
+| 权限档位 | `sandbox-policy.mode` 与 `approval.policy` 必须组成 `dsh-permission-presets` 的 `presets` 表内一项（`read-only` / `workspace-write` / `danger-full-access`）。DSHA 会在 web profile 的用户补丁层钉住 `defaultPreset` 兜底；插件仍不应删改 `DSH_PERMISSION_MODE`，也不应只改其中一行 |
+| 运行时目录 | 离线运行时是受管且只读的；DSHA 自身的启动器与 `/root/dsh-bin` 守卫包装（`adb` / `rm` / `dd` 等）不应被插件改写 |
+
+**遇到「插件启用后 Web 起不来」怎么办：**
+
+1. 进 App 的**启动恢复页**（明确的启动故障会自动进入），或在维护页查看最近一次失败原因。
+2. 停用或删除刚启用的插件，然后重启 Web。
+3. 形如 `@deepseek-ai/dsh-base: composed sandbox and approval defaults match no preset` 的报错属于上表「权限档位」一行，停用插件后即可恢复启动。
+
+---
+
 ## 架构
 
 ```

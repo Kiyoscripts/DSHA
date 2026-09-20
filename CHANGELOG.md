@@ -9,6 +9,13 @@
   依赖 `DSHA_APP` 判断宿主的插件（如 dsh-purge）会把 DSHA 误判为独立 dsh Web，
   进而去改写本 App 的启动器与 `/root/dsh-bin` 守卫包装，或自行重启/重装 Web。
   所有 dsh 启动路径（web 与恢复 profile）共用同一处命令组装，故此修复一并生效。
+- 新增权限兜底行：启动时在 web profile 的用户补丁层钉住 `permission` 行的
+  `defaultPreset`，并表达为与 `sandbox-policy.mode` / `approval.policy` 同源的
+  `DSH_PERMISSION_MODE` 函数。第三方插件改写其中一行、或删掉该变量时，组合出的
+  `(sandbox, approval)` 可能落在 `presets` 表外，`dsh-permission-presets` 随即抛
+  「composed sandbox and approval defaults match no preset」，`@deepseek-ai/dsh-base`
+  加载失败，Web 完全起不来（真机报障：vivo V2032 / 兼容版 / dsh-purge 1.1.9）。
+  该行只影响新会话的初始预设，会话内仍可自由切换，不锁死设置页。
 
 ### v0.1.5-rc2 / v0.1.5-rc2low（正式版）
 
